@@ -1,0 +1,17 @@
+#salary=1325
+#prlsmon=-115
+#accrual=400
+#other=0
+#constantloss0=300
+#constantloss1=250
+#constantloss2=200
+#constantloss3=105
+#constantloss4=60
+#constantloss5=0
+#constantloss6=0
+#constantloss7=0
+#constantloss8=0
+#constantloss9=0
+#totActprf=295
+#totAccrual=600
+#totAcc=895
