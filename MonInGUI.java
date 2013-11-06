@@ -92,7 +92,7 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 		
 		// Specify GroupLayout for the layout manager
 		GroupLayout layout = new GroupLayout(jfrm.getContentPane());
-        jfrm.getContentPane().setLayout(layout);
+        	jfrm.getContentPane().setLayout(layout);
 		
 		GroupLayout layout1 = new GroupLayout(jpnl1);
 		jpnl1.setLayout(layout1);
@@ -135,25 +135,19 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 		jtfPrfLsMon.setActionCommand("PrfLsMon");
 		jtfAccrual.setActionCommand("Accrual");
 		jtfOther.setActionCommand("Other");
-		jtfTotAccount.setActionCommand("TotAcc");
-		jtfTotAccrual.setActionCommand("TotAccrual");
-		jtfTotActPrf.setActionCommand("TotActPrf");
 		
 		jtfSalary.addActionListener(this);
 		jtfPrfLsMon.addActionListener(this);
 		jtfAccrual.addActionListener(this);
 		jtfOther.addActionListener(this);
-		jtfTotAccount.addActionListener(this);
-		jtfTotAccrual.addActionListener(this);
-		jtfTotActPrf.addActionListener(this);
-				
+		
 		jtabConstLos = new JTable(data, columnNames);
 		jtabConstLos.setPreferredScrollableViewportSize(new Dimension(140, 140));
 		jtabConstLos.setFillsViewportHeight(true);
 		
-        JScrollPane scrollPane = new JScrollPane(jtabConstLos);
-		
-        jpnl2.setLayout(new FlowLayout());
+	        JScrollPane scrollPane = new JScrollPane(jtabConstLos);
+			
+	        jpnl2.setLayout(new FlowLayout());
 		jpnl2.setSize(scrollPane.getWidth(),scrollPane.getHeight());
 		jpnl2.add(scrollPane);
 		
@@ -222,7 +216,7 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 				   .addComponent(jtfPrfLsMon)
 		    	   .addComponent(jtfAccrual)
 		           .addComponent(jtfOther))
-	    );
+	        );
 		
 		
 		layout2.setVerticalGroup(           
@@ -242,8 +236,6 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 		           .addComponent(jlabTotAcc)
 		           .addComponent(jtfTotAccount)
 		           .addComponent(jbtnSave))
-		      //.addGroup(layout2.createParallelGroup(GroupLayout.Alignment.BASELINE)
-		      //   .addComponent(jlabError))
 		      .addGap(10)	   
 		);
 		
@@ -256,7 +248,6 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 		            .addComponent(jlabTotActPrf)
 		            .addComponent(jlabTotAccrual)
 		            .addComponent(jlabTotAcc))
-		            //.addComponent(jlabError))
 		      .addGroup(layout2.createParallelGroup(GroupLayout.Alignment.LEADING)
 		    		.addGap(jbtnCalc.getHeight())
 		            .addGap(jlabTotal.getHeight())
@@ -275,9 +266,6 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 		
 		
 		//add panel to the frame
-		//jfrm.add(jpnl1);
-		//jfrm.add(jpnl2);
-		//jfrm.add(jpnl3);
 		layout.setVerticalGroup(
 		   layout.createSequentialGroup()
 		      .addGap(10)		      
@@ -287,7 +275,7 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
 					  .addComponent(jpnl3))
 			  .addComponent(jlabError)
-	    );
+	        );
 		
 		layout.setHorizontalGroup(
 		   layout.createSequentialGroup()
@@ -418,7 +406,6 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 					 jtfOther.setText("0");					 
 				 }
 			}
-			
 		}
 	}
 	
