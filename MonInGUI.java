@@ -154,6 +154,9 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 		//set not enabled jtfAccrual and jtabConstLoss
 		jtfAccrual.setEnabled(false);
 		jtabConstLos.setEnabled(false);		
+		jtfTotAccount.setEnabled(false);
+		jtfTotAccrual.setEnabled(false);
+		jtfTotActPrf.setEnabled(false);
 		
 		//add action listener for the jtable		
 		
