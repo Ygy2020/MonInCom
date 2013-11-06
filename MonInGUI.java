@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 
 import javax.swing.GroupLayout;
@@ -13,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -29,7 +32,7 @@ import fileIO.MonInFileIO;
  * @author User
  * @version 1.0
  */
-public class MonInGUI extends JPanel implements ActionListener, ItemListener, TableModelListener {
+public class MonInGUI extends JPanel implements ActionListener, ItemListener, TableModelListener, WindowListener {
 	
 	String fileName = "MonInFile.txt";
 	
@@ -37,7 +40,9 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 	 * Need to avoid warning
 	 */
 	private static final long serialVersionUID = 1L;
-
+	
+	JFrame jfrm;
+	
 	String salary, prlsmon, accrual, other, 
 		   totActprf, totAccrual, totAccount;
 	String constantloss[] = new String[10];
@@ -78,7 +83,7 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 		}
 			
 		// create a new JFrame container
-		JFrame jfrm = new JFrame("MonInCom");
+		jfrm = new JFrame("MonInCom");
 		jfrm.setLayout(new FlowLayout());
 		
 		JPanel jpnl1 = new JPanel();
@@ -101,8 +106,12 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 		jfrm.setResizable(false);
 		
 		// terminate the program when the user closes the application
-		jfrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	
+		jfrm.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+	    
+		
+		//add action listener for the window
+		jfrm.addWindowListener(this);
+		
 		// create the text fields
 		jtfSalary = new JTextField(salary,8);
 		jtfPrfLsMon = new JTextField(prlsmon,8);
@@ -148,7 +157,7 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 		jpnl2.setSize(scrollPane.getWidth(),scrollPane.getHeight());
 		jpnl2.add(scrollPane);
 		
-		
+		//add action listener for the jtable
 		jtabConstLos.getModel().addTableModelListener(this);
 		
 		//set not enabled jtfAccrual and jtabConstLoss
@@ -157,8 +166,6 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 		jtfTotAccount.setEnabled(false);
 		jtfTotAccrual.setEnabled(false);
 		jtfTotActPrf.setEnabled(false);
-		
-		//add action listener for the jtable		
 		
 		// create the buttons
 		jbtnCalc = new JButton("Calc");
@@ -375,6 +382,7 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 				 try{
 					 Double.parseDouble(jtfSalary.getText());
 					 jlabError.setText("");
+					 boolSave = true;
 				 } catch (NumberFormatException ex){
 					 jlabError.setText("Only number allowed");
 					 jtfSalary.setText("0");					 
@@ -384,6 +392,7 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 				 try{
 					 Double.parseDouble(jtfPrfLsMon.getText());
 					 jlabError.setText("");
+					 boolSave = true;
 				 } catch (NumberFormatException ex){
 					 jlabError.setText("Only number allowed");
 					 jtfPrfLsMon.setText("0");					 
@@ -393,6 +402,7 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 				 try{
 					 Double.parseDouble(jtfAccrual.getText());
 					 jlabError.setText("");
+					 boolSave = true;
 				 } catch (NumberFormatException ex){
 					 jlabError.setText("Only number allowed");
 					 jtfAccrual.setText("0");					 
@@ -402,38 +412,13 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 				 try{
 					 Double.parseDouble(jtfOther.getText());
 					 jlabError.setText("");
+					 boolSave = true;
 				 } catch (NumberFormatException ex){
 					 jlabError.setText("Only number allowed");
 					 jtfOther.setText("0");					 
 				 }
 			}
-			else if(e.getActionCommand().equals("TotAcc")){ 
-				 try{
-					 Double.parseDouble(jtfTotAccount.getText());
-					 jlabError.setText("");
-				 } catch (NumberFormatException ex){
-					 jlabError.setText("Only number allowed");
-					 jtfTotAccount.setText("0");					 
-				 }
-			}
-			else if(e.getActionCommand().equals("TotAccrual")){ 
-				 try{
-					 Double.parseDouble(jtfTotAccrual.getText());
-					 jlabError.setText("");
-				 } catch (NumberFormatException ex){
-					 jlabError.setText("Only number allowed");
-					 jtfTotAccrual.setText("0");					 
-				 }
-			}
-			else if(e.getActionCommand().equals("TotActPrf")){ 
-				 try{
-					 Double.parseDouble(jtfTotActPrf.getText());
-					 jlabError.setText("");
-				 } catch (NumberFormatException ex){
-					 jlabError.setText("Only number allowed");
-					 jtfTotActPrf.setText("0");					 
-				 }
-			}			
+			
 		}
 	}
 	
@@ -441,6 +426,7 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 		try{
 			 Double.parseDouble(jtabConstLos.getValueAt(e.getLastRow(),e.getColumn()).toString());
 			 jlabError.setText("");
+			 boolSave = true;
 		 } catch (NumberFormatException ex){
 			 jlabError.setText("Only number allowed");
 			 jtabConstLos.setValueAt("0",e.getLastRow(),e.getColumn());					 
@@ -489,30 +475,39 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 	 * Save the modification on the file associated with the program
 	 */
 	boolean saveChange(){
-		try{
-			MonInFileIO srcFile = new MonInFileIO(fileName);
-			double dConstantloss[] = new double[10];
-						
-			srcFile.WriteFile("salary", jtfSalary.getText());
-			srcFile.WriteFile("prlsmon", jtfPrfLsMon.getText());
-			srcFile.WriteFile("accrual", jtfAccrual.getText());			
-			srcFile.WriteFile("other", jtfOther.getText());
-			for (int i=0; i<jtabConstLos.getRowCount();i++) {
-				dConstantloss[i] = Double.parseDouble(jtabConstLos.getValueAt(i, 0).toString());			
-				srcFile.WriteFile("constantloss"+i, Double.toString(dConstantloss[i]));
+		if (boolSave) {
+			try{
+				MonInFileIO srcFile = new MonInFileIO(fileName);
+				double dConstantloss[] = new double[10];
+							
+				srcFile.WriteFile("salary", jtfSalary.getText());
+				srcFile.WriteFile("prlsmon", jtfPrfLsMon.getText());
+				srcFile.WriteFile("accrual", jtfAccrual.getText());			
+				srcFile.WriteFile("other", jtfOther.getText());
+				for (int i=0; i<jtabConstLos.getRowCount();i++) {
+					dConstantloss[i] = Double.parseDouble(jtabConstLos.getValueAt(i, 0).toString());			
+					srcFile.WriteFile("constantloss"+i, Double.toString(dConstantloss[i]));
+				}
+				
+				srcFile.WriteFile("totActprf", jtfTotActPrf.getText());
+				srcFile.WriteFile("totAccrual", jtfTotAccrual.getText());
+				srcFile.WriteFile("totAccount", jtfTotAccount.getText());
+				
+				jtfAccrual.setText(jtfTotAccrual.getText());
+				
+				boolSave = true;
+				return true;
+			} catch (IOException ex){
+				jlabError.setText(ex.toString());
+				boolSave = false;
+				return false;	
 			}
-			
-			srcFile.WriteFile("totActprf", jtfTotActPrf.getText());
-			srcFile.WriteFile("totAccrual", jtfTotAccrual.getText());
-			srcFile.WriteFile("totAccount", jtfTotAccount.getText());
-			
-			jtfAccrual.setText(jtfTotAccrual.getText());
-			
-			return true;
-		} catch (IOException ex){
-			jlabError.setText(ex.toString());
-			return false;	
 		}
+		else {
+			JOptionPane.showMessageDialog(null, "There is nothing to save", "Nothing to save", JOptionPane.INFORMATION_MESSAGE);
+			return true;
+		}
+		
 	}
 	
 	/**
@@ -525,5 +520,43 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener, Ta
 				new MonInGUI();
 			}
 		});
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		int answer;
+		if (boolSave) {
+			answer= JOptionPane.showConfirmDialog(null, "There is unsaved modification, you want to save it?", "Closing",JOptionPane.YES_NO_CANCEL_OPTION);
+			if (answer == JOptionPane.YES_OPTION) {
+				saveChange();
+				jfrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			}
+			else if (answer == JOptionPane.NO_OPTION) jfrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		}
+		else jfrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {		
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {		
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {				
 	}
 }
