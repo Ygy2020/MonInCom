@@ -30,7 +30,7 @@ import fileIO.MonInFileIO;
  * Swing GUI for the Monthly InCome <br>
  * it use the GroupLayout as Layout Manager
  * @author User
- * @version 1.0
+ * @version 1.8
  */
 public class MonInGUI extends JPanel implements ActionListener, ItemListener, TableModelListener, WindowListener {
 	
