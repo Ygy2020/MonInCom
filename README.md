@@ -1,4 +1,4 @@
 MonInCom
 ========
 
-Simply Java application that is an account income manager 
+Simply Java Swing application that is an account income manager 
