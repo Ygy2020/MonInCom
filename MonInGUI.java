@@ -1,6 +1,7 @@
 package swingGUI;
 
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -17,6 +18,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 import fileIO.MonInFileIO;
 
@@ -26,20 +29,19 @@ import fileIO.MonInFileIO;
  * @author User
  * @version 1.0
  */
-public class MonInGUI extends JPanel implements ActionListener, ItemListener {
+public class MonInGUI extends JPanel implements ActionListener, ItemListener, TableModelListener {
 	
 	String fileName = "MonInFile.txt";
 	
 	/**
-	 * 
+	 * Need to avoid warning
 	 */
 	private static final long serialVersionUID = 1L;
 
-	String salary, prlsmon, accrual, other, constantloss1, constantloss2,
-		   constantloss3, constantloss4, constantloss5,constantloss6, 
-		   constantloss7, constantloss8, constantloss9, constantloss10, 
+	String salary, prlsmon, accrual, other, 
 		   totActprf, totAccrual, totAccount;
-		
+	String constantloss[] = new String[10];
+	
 	JTextField jtfSalary; // hold the salary
 	JTextField jtfPrfLsMon; // hold the profit from the last month
 	JTextField jtfAccrual; // hold the accrual
@@ -69,16 +71,29 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener {
 		ReadFile();
 		
 		String[] columnNames = {"Constant Loss"};
-		Object[][] data = {{constantloss1}, {constantloss2},
-				   {constantloss3}, {constantloss4}, {constantloss5},{constantloss6}, 
-				   {constantloss7}, {constantloss8}, {constantloss9}, {constantloss10}};
+		Object[][] data= new Object[10][1];
 		
+		for (int i=0; i<10;i++){
+		      data[i][0]=constantloss[i];		
+		}
+			
 		// create a new JFrame container
 		JFrame jfrm = new JFrame("MonInCom");
-	
+		jfrm.setLayout(new FlowLayout());
+		
+		JPanel jpnl1 = new JPanel();
+		JPanel jpnl2 = new JPanel();
+		JPanel jpnl3 = new JPanel();
+		
 		// Specify GroupLayout for the layout manager
 		GroupLayout layout = new GroupLayout(jfrm.getContentPane());
-		jfrm.getContentPane().setLayout(layout);
+        jfrm.getContentPane().setLayout(layout);
+		
+		GroupLayout layout1 = new GroupLayout(jpnl1);
+		jpnl1.setLayout(layout1);
+		
+		GroupLayout layout2 = new GroupLayout(jpnl3);
+		jpnl3.setLayout(layout2);
 		
 		// give the frame an initial size 
 		jfrm.setSize(600,400);
@@ -89,13 +104,22 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener {
 		jfrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	
 		// create the text fields
-		jtfSalary = new JTextField(salary,14);
-		jtfPrfLsMon = new JTextField(prlsmon,14);
-		jtfAccrual = new JTextField(accrual,14);
-		jtfOther = new JTextField(other,14);
-		jtfTotAccount = new JTextField(totAccount,14);
-		jtfTotAccrual = new JTextField(totAccrual,14);
-		jtfTotActPrf = new JTextField(totActprf,14);
+		jtfSalary = new JTextField(salary,8);
+		jtfPrfLsMon = new JTextField(prlsmon,8);
+		jtfAccrual = new JTextField(accrual,8);
+		jtfOther = new JTextField(other,8);
+		jtfTotAccount = new JTextField(totAccount,8);
+		jtfTotAccrual = new JTextField(totAccrual,8);
+		jtfTotActPrf = new JTextField(totActprf,8);
+		
+		//force a max dimension to all JTextField
+		jtfSalary.setMaximumSize(new Dimension(60,60));
+		jtfPrfLsMon.setMaximumSize(new Dimension(60,60));
+		jtfAccrual.setMaximumSize(new Dimension(60,60));
+		jtfOther.setMaximumSize(new Dimension(60,60));
+		jtfTotAccount.setMaximumSize(new Dimension(60,60)); 
+		jtfTotAccrual.setMaximumSize(new Dimension(60,60)); 
+		jtfTotActPrf.setMaximumSize(new Dimension(60,60));
 		
 		// set the action commands for the text fields
 		jtfSalary.setActionCommand("Salary");
@@ -115,16 +139,23 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener {
 		jtfTotActPrf.addActionListener(this);
 				
 		jtabConstLos = new JTable(data, columnNames);
-		jtabConstLos.setPreferredScrollableViewportSize(new Dimension(70, 70));
+		jtabConstLos.setPreferredScrollableViewportSize(new Dimension(140, 140));
 		jtabConstLos.setFillsViewportHeight(true);
-		JScrollPane scrollPane = new JScrollPane(jtabConstLos);
-				
+		
+        JScrollPane scrollPane = new JScrollPane(jtabConstLos);
+		
+        jpnl2.setLayout(new FlowLayout());
+		jpnl2.setSize(scrollPane.getWidth(),scrollPane.getHeight());
+		jpnl2.add(scrollPane);
+		
+		
+		jtabConstLos.getModel().addTableModelListener(this);
+		
 		//set not enabled jtfAccrual and jtabConstLoss
 		jtfAccrual.setEnabled(false);
 		jtabConstLos.setEnabled(false);		
 		
-		//add action listener for the jtable
-		//TODO
+		//add action listener for the jtable		
 		
 		// create the buttons
 		jbtnCalc = new JButton("Calc");
@@ -150,77 +181,117 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener {
 	
 		// add the listener the Check Box
 		jcbAdvSett.addItemListener(this);
-	
-		layout.setVerticalGroup(
-		   layout.createSequentialGroup()
+			
+		//built up the layout
+		layout1.setVerticalGroup(
+		   layout1.createSequentialGroup()
 		      .addGap(10)		      
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		      .addGroup(layout1.createParallelGroup(GroupLayout.Alignment.BASELINE)
 		    	   .addComponent(jlabSalary)
-		    	   .addComponent(jtfSalary)		    	   
-		    	   .addComponent(scrollPane))		         
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		    	   .addComponent(jtfSalary))		         
+		      .addGroup(layout1.createParallelGroup(GroupLayout.Alignment.BASELINE)
 		           .addComponent(jlabPrfLsMon)
 		    	   .addComponent(jtfPrfLsMon))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)		    	   
+		      .addGroup(layout1.createParallelGroup(GroupLayout.Alignment.BASELINE)		    	   
 		    	   .addComponent(jlabAccrual)
 		           .addComponent(jtfAccrual))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)		           
+		      .addGroup(layout1.createParallelGroup(GroupLayout.Alignment.BASELINE)		           
 		           .addComponent(jlabOther)
+		           .addComponent(jtfOther)));
+		
+		layout1.setHorizontalGroup(
+		   layout1.createSequentialGroup()
+			  .addGap(10) 
+			  .addGroup(layout1.createParallelGroup(GroupLayout.Alignment.LEADING)
+			       .addComponent(jlabSalary)
+				   .addComponent(jlabPrfLsMon)
+				   .addComponent(jlabAccrual)
+				   .addComponent(jlabOther))
+		      .addGroup(layout1.createParallelGroup(GroupLayout.Alignment.LEADING)
+		    	   .addComponent(jtfSalary)
+				   .addComponent(jtfPrfLsMon)
+		    	   .addComponent(jtfAccrual)
 		           .addComponent(jtfOther))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)		           
+	    );
+		
+		
+		layout2.setVerticalGroup(           
+		   layout2.createSequentialGroup()
+			  .addGroup(layout2.createParallelGroup(GroupLayout.Alignment.BASELINE)		           
 		           .addComponent(jbtnCalc)
 		           .addComponent(jcbAdvSett))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)		           
+		      .addGroup(layout2.createParallelGroup(GroupLayout.Alignment.BASELINE)		           
 		           .addComponent(jlabTotal))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)		           
+		      .addGroup(layout2.createParallelGroup(GroupLayout.Alignment.BASELINE)		           
 		           .addComponent(jlabTotActPrf)
 		           .addComponent(jtfTotActPrf))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)		           
+		      .addGroup(layout2.createParallelGroup(GroupLayout.Alignment.BASELINE)		           
 		           .addComponent(jlabTotAccrual)
 		           .addComponent(jtfTotAccrual))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)		           
+		      .addGroup(layout2.createParallelGroup(GroupLayout.Alignment.BASELINE)		           
 		           .addComponent(jlabTotAcc)
 		           .addComponent(jtfTotAccount)
 		           .addComponent(jbtnSave))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-		    	   .addComponent(jlabError))
+		      //.addGroup(layout2.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		      //   .addComponent(jlabError))
 		      .addGap(10)	   
 		);
-		layout.setHorizontalGroup(
-		   layout.createSequentialGroup()
+		
+		layout2.setHorizontalGroup(
+		   layout2.createSequentialGroup()
 		     .addGap(10) 
-		     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-		    		.addComponent(jlabSalary)
-				    .addComponent(jlabPrfLsMon)
-		    	    .addComponent(jlabAccrual)
-		            .addComponent(jlabOther)
-		            .addComponent(jbtnCalc)
+		     .addGroup(layout2.createParallelGroup(GroupLayout.Alignment.LEADING)
+		    		.addComponent(jbtnCalc)
 		            .addComponent(jlabTotal)
 		            .addComponent(jlabTotActPrf)
 		            .addComponent(jlabTotAccrual)
-		            .addComponent(jlabTotAcc)
-		            .addComponent(jlabError))
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-		    		.addComponent(jtfSalary)
-				    .addComponent(jtfPrfLsMon)
-		    	    .addComponent(jtfAccrual)
-		            .addComponent(jtfOther)
-		            .addGap(jbtnCalc.getHeight())
+		            .addComponent(jlabTotAcc))
+		            //.addComponent(jlabError))
+		      .addGroup(layout2.createParallelGroup(GroupLayout.Alignment.LEADING)
+		    		.addGap(jbtnCalc.getHeight())
 		            .addGap(jlabTotal.getHeight())
 		            .addComponent(jtfTotActPrf)
 		            .addComponent(jtfTotAccrual)
 		            .addComponent(jtfTotAccount)
 		            .addGap(jlabError.getHeight()))
 		      .addGap(10)      
-		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-		    		.addComponent(scrollPane)
-		            .addComponent(jcbAdvSett)		    		
+		      .addGroup(layout2.createParallelGroup(GroupLayout.Alignment.TRAILING)
+		    		.addComponent(jcbAdvSett)		    		
 		      		.addComponent(jbtnSave))
-		      .addComponent(jlabError)
+		      //.addComponent(jlabError)
 		      .addGap(10)		
 		);		
-	
+
+		
+		
+		//add panel to the frame
+		//jfrm.add(jpnl1);
+		//jfrm.add(jpnl2);
+		//jfrm.add(jpnl3);
+		layout.setVerticalGroup(
+		   layout.createSequentialGroup()
+		      .addGap(10)		      
+		      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+				      .addComponent(jpnl1)
+				      .addComponent(jpnl2))
+			  .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+					  .addComponent(jpnl3))
+			  .addComponent(jlabError)
+	    );
+		
+		layout.setHorizontalGroup(
+		   layout.createSequentialGroup()
+		     .addGap(10) 
+		     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+		    		 .addComponent(jpnl1)
+		    		 .addComponent(jpnl3)
+		    		 .addComponent(jlabError))
+		     .addComponent(jpnl2)
+		 );
+		
+		
 		// Display the frame
+		jfrm.pack();
 		jfrm.setVisible(true);		
 	}
 	
@@ -246,37 +317,14 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener {
 				else if (fileValue[i].contains("other")){
 					other = fileValue[i].substring(fileValue[i].indexOf("=")+1);
 				}
-				else if (fileValue[i].contains("constantloss0")){
-					constantloss1 = fileValue[i].substring(fileValue[i].indexOf("=")+1);
+				
+				for (int j=0;j<10;j++){
+					if (fileValue[i].contains("constantloss"+j)){
+						constantloss[j] = fileValue[i].substring(fileValue[i].indexOf("=")+1);
+					}				
 				}
-				else if (fileValue[i].contains("constantloss1")){
-					constantloss2 = fileValue[i].substring(fileValue[i].indexOf("=")+1);
-				}
-				else if (fileValue[i].contains("constantloss2")){
-					constantloss3 = fileValue[i].substring(fileValue[i].indexOf("=")+1);
-				}
-				else if (fileValue[i].contains("constantloss3")){
-					constantloss4 = fileValue[i].substring(fileValue[i].indexOf("=")+1);
-				}
-				else if (fileValue[i].contains("constantloss4")){
-					constantloss5 = fileValue[i].substring(fileValue[i].indexOf("=")+1);
-				}
-				else if (fileValue[i].contains("constantloss5")){
-					constantloss6 = fileValue[i].substring(fileValue[i].indexOf("=")+1);
-				}
-				else if (fileValue[i].contains("constantloss6")){
-					constantloss7 = fileValue[i].substring(fileValue[i].indexOf("=")+1);
-				}
-				else if (fileValue[i].contains("constantloss7")){
-					constantloss8 = fileValue[i].substring(fileValue[i].indexOf("=")+1);
-				}
-				else if (fileValue[i].contains("constantloss8")){
-					constantloss9 = fileValue[i].substring(fileValue[i].indexOf("=")+1);
-				}
-				else if (fileValue[i].contains("constantloss9")){
-					constantloss10 = fileValue[i].substring(fileValue[i].indexOf("=")+1);
-				}
-				else if (fileValue[i].contains("totActprf")){
+				
+				if (fileValue[i].contains("totActprf")){
 					totActprf = fileValue[i].substring(fileValue[i].indexOf("=")+1);
 				}
 				else if (fileValue[i].contains("totAccrual")){
@@ -382,10 +430,20 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener {
 					 jlabError.setText("Only number allowed");
 					 jtfTotActPrf.setText("0");					 
 				 }
-			}
-			
+			}			
 		}
 	}
+	
+	public void tableChanged(TableModelEvent e) {
+		try{
+			 Double.parseDouble(jtabConstLos.getValueAt(e.getLastRow(),e.getColumn()).toString());
+			 jlabError.setText("");
+		 } catch (NumberFormatException ex){
+			 jlabError.setText("Only number allowed");
+			 jtabConstLos.setValueAt("0",e.getLastRow(),e.getColumn());					 
+		 }		
+     }
+	
 	
 	/**
 	 * Calc the total, upon the value on the form
@@ -401,7 +459,8 @@ public class MonInGUI extends JPanel implements ActionListener, ItemListener {
 			dOther = Double.parseDouble(jtfOther.getText());
 			
 			for (int i=0; i<jtabConstLos.getRowCount();i++) {
-				dConstantloss[i] = Double.parseDouble(jtabConstLos.getValueAt(i, 0).toString());			
+				dConstantloss[i] = Double.parseDouble(jtabConstLos.getValueAt(i, 0).toString());
+				if (i==5) System.out.println(jtabConstLos.getValueAt(i, 0).toString());
 			}
 			
 			dTotActPrf = dSalary+dPrfLsMon+dOther;
